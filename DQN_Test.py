@@ -41,15 +41,17 @@ def main():
     q = Qnet()
     q.load_state_dict(torch.load("./bestPolicy.pth"))
     epsilon = 0.01 #Linear annealing from 8% to 1%
-    s = env.reset()
+    s, _ = env.reset()
+
     done = False
     score = 0
     while not done:
         a = q.sample_action(torch.from_numpy(s).float(), epsilon) 
-        s_prime, r, done, info = env.step(a)
+        s_prime, r, done, truncated, info = env.step(a)
         env.render()
         s = s_prime
         score += r
+        print(score)
         if done:
             break
     env.close()

@@ -87,14 +87,16 @@ def main():
     best_score = 0
     for n_epi in range(10000):
         epsilon = max(0.01, 0.08 - 0.01*(n_epi/200)) #Linear annealing from 8% to 1%
-        s = env.reset()
+        s, _ = env.reset()
         done = False
+
         while not done:
-            a = q.sample_action(torch.from_numpy(s).float(), epsilon) 
-            s_prime, r, done, info = env.step(a)
+            a = q.sample_action(torch.from_numpy(s).float(), epsilon)      
+            s_prime, r, done, truncated, info = env.step(a)
             done_mask = 0.0 if done else 1.0
             memory.put((s,a,r/100.0,s_prime, done_mask))
             s = s_prime
+
             score += r
             if done:
                 break
@@ -107,17 +109,9 @@ def main():
             print("n_episode :{}, score : {:.1f}, n_buffer : {}, eps : {:.1f}%".format(n_epi, score/print_interval, memory.size(), epsilon*100))
             if score/print_interval > best_score:
                 best_score = score/print_interval
-                torch.save(f="./bestPolicy.pth",obj=q.state_dict())
-                print(best_score)
+                torch.save(obj=q.state_dict(),f="/home/ssu20/rlDir/bestPolicy.pth")
             score = 0.0
-            
-
-
-
     env.close()
-
-
-
 
 if __name__ == '__main__':
     main()
