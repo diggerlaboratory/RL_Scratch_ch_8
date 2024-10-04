@@ -47,9 +47,9 @@ def main():
     while not done:
         a = q.sample_action(torch.from_numpy(s).float(), epsilon) 
         s_prime, r, done, info = env.step(a)
+        env.render()
         s = s_prime
         score += r
-        print(score)
         if done:
             break
     env.close()
