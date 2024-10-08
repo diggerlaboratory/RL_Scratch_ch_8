@@ -63,8 +63,10 @@ class Qnet(nn.Module):
 def train(q, q_target, memory, optimizer):
     for i in range(10):
         s,a,r,s_prime,done_mask = memory.sample(batch_size)
-
         q_out = q(s)
+        # 행동 가치 축,1 축으로, 한 행동의 행동 가치를 가져옴
+        print(a)
+        input()
         q_a = q_out.gather(1,a)
         max_q_prime = q_target(s_prime).max(1)[0].unsqueeze(1)
         target = r + gamma * max_q_prime * done_mask
@@ -75,7 +77,7 @@ def train(q, q_target, memory, optimizer):
         optimizer.step()
 
 def main():
-    env = gym.make('CartPole-v1')
+    env = gym.make('CartPole-v1',render_mode='human')
     q = Qnet()
     q_target = Qnet()
     q_target.load_state_dict(q.state_dict())
